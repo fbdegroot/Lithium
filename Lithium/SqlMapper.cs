@@ -291,7 +291,7 @@ namespace Lithium
 			if (t == typeof(object) || t == typeof(DynamicRow))
 				return GetDynamicDeserializer<T>(dataRecord);
 
-			if (SupportedTypes.ContainsKey(t) == false && t.IsEnum == false)
+			if (SupportedTypes.ContainsKey(t) == false && t.IsEnum == false && t.IsNullableEnum() == false)
 				return GetClassDeserializer<T>(dataRecord);
 
 			return GetStructDeserializer<T>();
@@ -513,6 +513,19 @@ namespace Lithium
 				};
 			}
 
+			if (t.IsNullableEnum()) {
+				return r => {
+					object value = r.GetValue(0);
+					if (value == DBNull.Value)
+						return default(T);
+
+					if (value.GetType() == typeof(string))
+						return (T)Enum.Parse(Nullable.GetUnderlyingType(t), value as string, true);
+
+					return (T)Enum.ToObject(Nullable.GetUnderlyingType(t), value);
+				};
+			}
+
 			return r => {
 				object value = r.GetValue(0);
 				if (value == DBNull.Value)
@@ -643,7 +656,7 @@ namespace Lithium
 				Type memberType = member.Type();
 
 				// maximum of 4 levels deep
-				if ((parents == null || parents.Count <= 4) && SupportedTypes.ContainsKey(memberType) == false && memberType.IsEnum == false) {
+				if ((parents == null || parents.Count <= 4) && SupportedTypes.ContainsKey(memberType) == false && memberType.IsEnum == false && memberType.IsNullableEnum() == false) {
 					var newParents = parents == null ? new List<MemberInfo>() : new List<MemberInfo>(parents);
 					newParents.Add(member);
 
