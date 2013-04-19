@@ -8,6 +8,7 @@ using Lithium.Tests.Models;
 using Lithium.SimpleExtensions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Threading.Tasks;
+using System.Data.SqlServerCe;
 
 namespace Lithium.Tests
 {
@@ -19,8 +20,8 @@ namespace Lithium.Tests
 		[ClassInitialize]
 		public static void SetUp(TestContext context)
 		{
-			//Connection = new SqlCeConnection(@"Data Source=Tests.sdf");
-			Connection = new SqlConnection(ConfigurationManager.ConnectionStrings["Sql"].ConnectionString);
+			Connection = new SqlCeConnection(@"Data Source=Tests.sdf");
+			//Connection = new SqlConnection(ConfigurationManager.ConnectionStrings["Sql"].ConnectionString);
 
 			Connection.Open();
 		}
